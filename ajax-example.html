@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="http://code.jquery.com/jquery-latest.js" type="text/javascript"></script>
+</head>
+<body>
+    <input type="file" id="file">
+    <button type="button" id="post-btn" disabled="true">Enviar</button>
+    <p id="file-msg"></p>
+    <a href="#" id="file-link" style="display: none;" download></a>
+    <script type="text/javascript">
+        $(function(){
+            var url = 'https://script.google.com/macros/s/<googlescriptCode>/exec';
+            var params = {};
+
+            $('#file').on("change", function() {
+                var file = this.files[0];
+                var fr = new FileReader();
+                fr.onloadend = function(e){
+                    if (e.target.error != null) {
+                      error("File " + file.name + " could not be read.");
+                      return;
+                    } else {
+                        params.filename = file.name;
+                        params.file = e.target.result;
+                        $("#file-link").hide();
+                        $("#file-msg").text("");
+                        $("#file-link").text(file.name);
+                        $("#post-btn").attr("disabled",false);
+                    }
+                }
+                fr.readAsDataURL(file);
+            });
+            $("#post-btn").click(function(){
+                $.post(url, params, function(response) {
+                    $("#file-link").attr("href",response.data.url);;
+                    $("#file-link").show();
+                    console.log(response);
+                });
+            });
+            function error(e) {
+                console.error(e);
+            }
+            function mensaje(e) {
+                console.log(e);
+            }
+        });
+    </script>
+</body>
+</html>
